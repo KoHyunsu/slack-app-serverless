@@ -1,0 +1,30 @@
+service: aws-bomb-slack-app-serverless
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: nodejs14.x
+  environment:
+    SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+    SLACK_CLIENT_SECRET: ${env:SLACK_CLIENT_SECRET}
+    SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
+    DB_NAME: ${env:DB_NAME}
+    DB_USERNAME: ${env:DB_USERNAME}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+functions:
+  slack:
+    handler: app.handler
+    events:
+      - http:
+          path: slack/events
+          method: post
+  oauth:
+    handler: app.oauthHandler
+    events:
+      - http:
+          path: slack/oauth_redirect
+          method: get            
+      - http:
+          path: slack/install
+          method: get
+plugins:
+  - serverless-offline
