@@ -1,5 +1,8 @@
-const orgInstall = require('./database/auth/store_user_org_install');
-const workspaceAuth = require('./database/auth/store_user_workspace_install');
+const db = require('./db');
+const orgInstall = require('./store_user_org_install');
+const workspaceAuth = require('./store_user_workspace_install');
+
+db.connect();
 
 module.exports.store = {
   storeInstallation: async (installation) => {
@@ -21,8 +24,8 @@ module.exports.store = {
       installQuery.isEnterpriseInstall
       && installQuery.enterpriseId !== undefined
     ) {
-      const findUser = await db.findUser(installQuery.enterpriseId);
-      return findUser;
+      // eslint-disable-next-line no-return-await
+      return await db.findUser(installQuery.enterpriseId);
     }
     if (installQuery.teamId !== undefined) {
       const findUser = await db.findUser(installQuery.teamId);

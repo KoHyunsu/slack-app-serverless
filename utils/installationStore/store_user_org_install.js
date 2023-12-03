@@ -1,4 +1,4 @@
-const model = require('../db');
+const model = require('./db');
 
 const saveUserOrgInstall = async (installation) => {
   const resp = await model.User.updateOne(

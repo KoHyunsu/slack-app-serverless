@@ -11,15 +11,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.465.0",
     "@slack/bolt": "^3.16.0",
-    "@slack/oauth": "^2.6.1",
-    "@vendia/serverless-express": "^4.10.4",
+    "aws-sdk": "^2.1510.0",
     "aws-serverless-express": "^3.4.0",
-    "dotenv": "^16.3.1",
     "eslint": "^8.54.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.0",
-    "mongodb": "^6.3.0",
     "mongoose": "^8.0.2",
     "serverless": "^3.38.0",
     "serverless-offline": "^13.3.0"

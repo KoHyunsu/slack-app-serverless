@@ -1,11 +1,7 @@
 const { App, AwsLambdaReceiver, ExpressReceiver, LogLevel } = require('@slack/bolt');
 const awsServerlessExpress = require('aws-serverless-express');
 const { registerListeners } = require('./listeners');
-const { store } = require('./store');
-
-const db = require('./database/db');
-
-db.connect();
+const { store } = require('./utils/installationStore');
 
 // Initialize your receiver
 const awsLambdaReceiver = new AwsLambdaReceiver({
@@ -19,7 +15,16 @@ const expressReceiver = new ExpressReceiver({
   installerOptions: {
     stateVerification: false,
   },
-  scopes: ['app_mentions:read', 'channels:history', 'chat:write', 'groups:history', 'im:history', 'mpim:history'],
+  scopes: [
+    'app_mentions:read',
+    'channels:history',
+    'channels:join',
+    'chat:write',
+    'files:read',
+    'groups:history',
+    'im:history',
+    'mpim:history',
+  ],
   installationStore: store,
   logLevel: LogLevel.DEBUG,
 });
@@ -32,31 +37,19 @@ const app = new App({
   processBeforeResponse: true,
   authorize: async (source) => {
     try {
+      console.log('source : ', source);
       const queryResult = await store.fetchInstallation(source);
-      console.log(queryResult);
       if (queryResult === undefined) {
         throw new Error('Failed fetching data from the Installation Store');
       }
-      const authorizeResult = {};
-      authorizeResult.userToken = queryResult.user.token;
-      if (queryResult.team !== undefined) {
-        authorizeResult.teamId = queryResult.team.id;
-      } else if (source.teamId !== undefined) {
-        authorizeResult.teamId = source.teamId;
-      }
-
-      if (queryResult.enterprise !== undefined) {
-        authorizeResult.enterpriseId = queryResult.enterprise.id;
-      } else if (source.enterpriseId !== undefined) {
-        authorizeResult.enterpriseId = source.enterpriseId;
-      }
-
-      if (queryResult.bot !== undefined) {
-        authorizeResult.botToken = queryResult.bot.token;
-        authorizeResult.botId = queryResult.bot.id;
-        authorizeResult.botUserId = queryResult.bot.userId;
-      }
-      console.log(JSON.stringify(authorizeResult));
+      const authorizeResult = {
+        userToken: queryResult?.user?.token,
+        teamId: queryResult?.team ? queryResult?.team?.id : source?.teamId,
+        enterpriseId: queryResult?.enterprise ? queryResult?.enterprise?.id : source?.enterpriseId,
+        botToken: queryResult?.bot ? queryResult?.bot?.token : undefined,
+        botId: queryResult?.bot ? queryResult.bot.id : undefined,
+        botUserId: queryResult?.bot ? queryResult.bot.userId : undefined,
+      };
       return authorizeResult;
     } catch (error) {
       throw new Error(error.message);

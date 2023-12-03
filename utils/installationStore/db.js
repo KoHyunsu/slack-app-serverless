@@ -1,20 +1,6 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
 
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${
-  process.env.DB_PASSWORD
-}@cluster001.svc0voq.mongodb.net/${process.env.DB_NAME
-}?retryWrites=true&w=majority`;
-
-const connect = async () => {
-  // Connect to MongoDB
-  await mongoose.connect(
-    uri,
-    {
-      serverSelectionTimeoutMS: 5000,
-    },
-  );
-};
+const connect = async () => mongoose.connect(process.env.DB_CONNECTION_URI);
 
 const usersSchema = mongoose.Schema(
   {
